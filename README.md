@@ -2,7 +2,7 @@
 群益自動收集Tick程式 Automatic Quote Machine
 
 # Working Enviroment 
-Windows 10 Professional (64-bit)
+Windows 10 Professional (64-bit)</br>
 Microsoft SQL Server Developer (64-bit)
 
 # Purpose:
@@ -18,11 +18,12 @@ This program will not stay connected to the Capital Solace Quote Server for too 
 4. table value function GetTodayTickAM
 5. store procedure sp_GetTicksIn5Min
 6. store procedure sp_GetTicksDaily
+7. store procedure ChkTick
 
 
 # How to use
 1. Use the Query.sql to create table, sp, and function needed for later use
 2. Put the stopprocess.ps at desired path
-3. Create a SQL agent job run the program at 8:45
+3. Create a SQL agent job run <b>ChkTick</b> at 8:45
 4. Fill in the login credential
 
