@@ -37,9 +37,10 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.listInformation = new System.Windows.Forms.ListBox();
             this.tabPage3 = new System.Windows.Forms.TabPage();
-            this.skQuote1 = new SKCOMTester.SKQuote();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.timer2 = new System.Windows.Forms.Timer(this.components);
+            this.skQuote1 = new SKCOMTester.SKQuote();
             this.groupBox1.SuspendLayout();
             this.tabPage3.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -106,7 +107,7 @@
             this.groupBox1.Controls.Add(this.txtPassWord);
             this.groupBox1.Location = new System.Drawing.Point(12, 13);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(510, 107);
+            this.groupBox1.Size = new System.Drawing.Size(432, 107);
             this.groupBox1.TabIndex = 22;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Login";
@@ -116,10 +117,10 @@
             this.listInformation.FormattingEnabled = true;
             this.listInformation.HorizontalExtent = 2;
             this.listInformation.HorizontalScrollbar = true;
-            this.listInformation.Location = new System.Drawing.Point(549, 21);
+            this.listInformation.Location = new System.Drawing.Point(465, 21);
             this.listInformation.Name = "listInformation";
             this.listInformation.ScrollAlwaysVisible = true;
-            this.listInformation.Size = new System.Drawing.Size(485, 95);
+            this.listInformation.Size = new System.Drawing.Size(569, 95);
             this.listInformation.TabIndex = 25;
             // 
             // tabPage3
@@ -133,19 +134,6 @@
             this.tabPage3.TabIndex = 3;
             this.tabPage3.Text = "報價";
             this.tabPage3.UseVisualStyleBackColor = true;
-            // 
-            // skQuote1
-            // 
-            this.skQuote1.Location = new System.Drawing.Point(37, 7);
-            this.skQuote1.LoginID = "";
-            this.skQuote1.LoginID2 = "";
-            this.skQuote1.Name = "skQuote1";
-            this.skQuote1.Size = new System.Drawing.Size(907, 458);
-            this.skQuote1.SKQuoteLib = null;
-            this.skQuote1.SKQuoteLib2 = null;
-            this.skQuote1.TabIndex = 0;
-            this.skQuote1.TickRunning = true;
-            this.skQuote1.GetMessage += new SKCOMTester.SKQuote.MyMessageHandler(this.GetMessage);
             // 
             // tabControl1
             // 
@@ -162,6 +150,25 @@
             // timer1
             // 
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
+            // timer2
+            // 
+            this.timer2.Enabled = true;
+            this.timer2.Interval = 10000;
+            this.timer2.Tick += new System.EventHandler(this.timer2_Tick);
+            // 
+            // skQuote1
+            // 
+            this.skQuote1.Location = new System.Drawing.Point(37, 7);
+            this.skQuote1.LoginID = "";
+            this.skQuote1.LoginID2 = "";
+            this.skQuote1.Name = "skQuote1";
+            this.skQuote1.Size = new System.Drawing.Size(907, 458);
+            this.skQuote1.SKQuoteLib = null;
+            this.skQuote1.SKQuoteLib2 = null;
+            this.skQuote1.TabIndex = 0;
+            this.skQuote1.TickRunning = true;
+            this.skQuote1.GetMessage += new SKCOMTester.SKQuote.MyMessageHandler(this.GetMessage);
             // 
             // Form1
             // 
@@ -195,6 +202,7 @@
         private System.Windows.Forms.TabPage tabPage3;
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.Timer timer2;
     }
 }
 

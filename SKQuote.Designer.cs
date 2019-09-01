@@ -28,8 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             this.btnDisconnect = new System.Windows.Forms.Button();
             this.btnServerTime = new System.Windows.Forms.Button();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
@@ -41,6 +41,8 @@
             this.ConnectedLabel = new System.Windows.Forms.Label();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.searchtype2 = new System.Windows.Forms.ComboBox();
+            this.boxTradeSession = new System.Windows.Forms.ComboBox();
+            this.btnKLineAM = new System.Windows.Forms.Button();
             this.boxOutType = new System.Windows.Forms.ComboBox();
             this.listKLine = new System.Windows.Forms.ListBox();
             this.btnKLine = new System.Windows.Forms.Button();
@@ -68,8 +70,6 @@
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.btnKLineAM = new System.Windows.Forms.Button();
-            this.boxTradeSession = new System.Windows.Forms.ComboBox();
             this.groupBox3.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.tabPage3.SuspendLayout();
@@ -199,6 +199,29 @@
             this.searchtype2.Size = new System.Drawing.Size(121, 23);
             this.searchtype2.TabIndex = 11;
             // 
+            // boxTradeSession
+            // 
+            this.boxTradeSession.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.boxTradeSession.FormattingEnabled = true;
+            this.boxTradeSession.Items.AddRange(new object[] {
+            "0 = 全盤K線(國內期選用)",
+            "1 = AM盤K線(國內期選用)"});
+            this.boxTradeSession.Location = new System.Drawing.Point(519, 23);
+            this.boxTradeSession.Name = "boxTradeSession";
+            this.boxTradeSession.Size = new System.Drawing.Size(163, 23);
+            this.boxTradeSession.TabIndex = 10;
+            // 
+            // btnKLineAM
+            // 
+            this.btnKLineAM.Font = new System.Drawing.Font("Yu Gothic UI", 9.5F);
+            this.btnKLineAM.Location = new System.Drawing.Point(708, 62);
+            this.btnKLineAM.Name = "btnKLineAM";
+            this.btnKLineAM.Size = new System.Drawing.Size(106, 25);
+            this.btnKLineAM.TabIndex = 9;
+            this.btnKLineAM.Text = "Query全盤";
+            this.btnKLineAM.UseVisualStyleBackColor = true;
+            this.btnKLineAM.Click += new System.EventHandler(this.btnKLineAM_Click);
+            // 
             // boxOutType
             // 
             this.boxOutType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -206,7 +229,7 @@
             this.boxOutType.Items.AddRange(new object[] {
             "0 = 舊版輸出格式",
             "1 = 新版輸出格式"});
-            this.boxOutType.Location = new System.Drawing.Point(395, 23);
+            this.boxOutType.Location = new System.Drawing.Point(362, 24);
             this.boxOutType.Name = "boxOutType";
             this.boxOutType.Size = new System.Drawing.Size(139, 23);
             this.boxOutType.TabIndex = 8;
@@ -223,11 +246,12 @@
             // 
             // btnKLine
             // 
-            this.btnKLine.Location = new System.Drawing.Point(717, 21);
+            this.btnKLine.Font = new System.Drawing.Font("Yu Gothic UI", 9.5F);
+            this.btnKLine.Location = new System.Drawing.Point(708, 24);
             this.btnKLine.Name = "btnKLine";
             this.btnKLine.Size = new System.Drawing.Size(106, 25);
             this.btnKLine.TabIndex = 6;
-            this.btnKLine.Text = "Query";
+            this.btnKLine.Text = "Query 早盤";
             this.btnKLine.UseVisualStyleBackColor = true;
             this.btnKLine.Click += new System.EventHandler(this.btnKLine_Click);
             // 
@@ -243,14 +267,14 @@
             "4 =完整日線。",
             "5 =週線。",
             "6 =月線。"});
-            this.boxKLine.Location = new System.Drawing.Point(262, 23);
+            this.boxKLine.Location = new System.Drawing.Point(210, 23);
             this.boxKLine.Name = "boxKLine";
             this.boxKLine.Size = new System.Drawing.Size(121, 23);
             this.boxKLine.TabIndex = 5;
             // 
             // txtKLine
             // 
-            this.txtKLine.Location = new System.Drawing.Point(182, 21);
+            this.txtKLine.Location = new System.Drawing.Point(55, 62);
             this.txtKLine.Name = "txtKLine";
             this.txtKLine.Size = new System.Drawing.Size(63, 25);
             this.txtKLine.TabIndex = 4;
@@ -424,21 +448,21 @@
             this.gridStocks.AllowUserToAddRows = false;
             this.gridStocks.AllowUserToDeleteRows = false;
             this.gridStocks.AllowUserToResizeRows = false;
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.AppWorkspace;
-            dataGridViewCellStyle5.Font = new System.Drawing.Font("PMingLiU", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.gridStocks.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.AppWorkspace;
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("PMingLiU", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.gridStocks.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this.gridStocks.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.gridStocks.Location = new System.Drawing.Point(6, 89);
             this.gridStocks.Name = "gridStocks";
             this.gridStocks.ReadOnly = true;
             this.gridStocks.RowHeadersVisible = false;
-            dataGridViewCellStyle6.Font = new System.Drawing.Font("PMingLiU", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.gridStocks.RowsDefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle4.Font = new System.Drawing.Font("PMingLiU", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.gridStocks.RowsDefaultCellStyle = dataGridViewCellStyle4;
             this.gridStocks.RowTemplate.Height = 24;
             this.gridStocks.Size = new System.Drawing.Size(879, 296);
             this.gridStocks.TabIndex = 10;
@@ -513,28 +537,6 @@
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(899, 459);
             this.tabControl1.TabIndex = 47;
-            // 
-            // btnKLineAM
-            // 
-            this.btnKLineAM.Location = new System.Drawing.Point(708, 62);
-            this.btnKLineAM.Name = "btnKLineAM";
-            this.btnKLineAM.Size = new System.Drawing.Size(115, 25);
-            this.btnKLineAM.TabIndex = 9;
-            this.btnKLineAM.Text = "NewQuery";
-            this.btnKLineAM.UseVisualStyleBackColor = true;
-            this.btnKLineAM.Click += new System.EventHandler(this.btnKLineAM_Click);
-            // 
-            // boxTradeSession
-            // 
-            this.boxTradeSession.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.boxTradeSession.FormattingEnabled = true;
-            this.boxTradeSession.Items.AddRange(new object[] {
-            "0 = 全盤K線(國內期選用)",
-            "1 = AM盤K線(國內期選用)"});
-            this.boxTradeSession.Location = new System.Drawing.Point(547, 23);
-            this.boxTradeSession.Name = "boxTradeSession";
-            this.boxTradeSession.Size = new System.Drawing.Size(163, 23);
-            this.boxTradeSession.TabIndex = 10;
             // 
             // SKQuote
             // 

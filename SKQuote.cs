@@ -336,8 +336,6 @@ namespace SKCOMTester
             //0 舊版輸出
 
             listKLine.Items.Clear();
-
-
             if (sKLineType < 0)
             {
                 MessageBox.Show("請選擇KLine類型");
@@ -532,10 +530,8 @@ namespace SKCOMTester
                     using (SqlConnection connection = new SqlConnection(connectionstr))
                     {
                         connection.Open();
-
                         sqlcmd.Connection = connection;
                         sqlcmd.CommandType = CommandType.Text;
-
                         stockPara.Value = txtTick.Text;
                         datePara.Value = nDate;
                         timePara.Value = lTimehms;
@@ -554,9 +550,7 @@ namespace SKCOMTester
                     }
                 }
                 catch(Exception ex)
-                {
-
-                }
+                {}
                 finally
                 {
                     listTicks.Items.Add("[OnNotifyTicks]" + strData);
@@ -784,7 +778,6 @@ namespace SKCOMTester
                     lowestPara.Value = sdata[4];
                     closePara.Value = sdata[5];
                     volPara.Value = sdata[6];
-
                     sqlcmd.CommandText = @" IF NOT EXISTS (SELECT 1 FROM [dbo].StockHisotryMin WHERE stockNo=@stockno AND sdate=@sdate AND stime=@stime)  
                                     BEGIN  INSERT INTO [dbo].[StockHisotryMin] ([stockNo],[sdate],[stime],[open],[highest],[lowest], [Close],[vol] ) VALUES
                                     (@stockno, @sdate,@stime, @open, @highest, @lowest, @close, @vol) END ";
@@ -800,7 +793,6 @@ namespace SKCOMTester
                     lowestPara.Value = sdata[3];
                     closePara.Value = sdata[4];
                     volPara.Value = sdata[5];
-                    //I
                     sqlcmd.CommandText = @"
                     IF NOT EXISTS (SELECT 1 FROM [dbo].StockHistoryDaily WHERE stockNo=@stockno AND sdate=@sdate) 
                     BEGIN INSERT INTO [dbo].[StockHistoryDaily] ([stockNo],[sdate],[open],[highest],[lowest], [Close],[vol] )
@@ -810,26 +802,6 @@ namespace SKCOMTester
                 }
                 sqlcmd.ExecuteNonQuery();
             }
-
-                //foreach (string word in sdata)
-                //{
-                //  Console.WriteLine("WORD: " + word);
-                //}
-
-
-                /*
-                stockPara.Value = getRegionName(region);
-                datestylePara.Value = getDateStyle(region);
-
-                SqlDataReader reader = sqlcmd.ExecuteReader();
-                totalRow = Convert.ToInt32(totalRowPara.Value);
-
-                if (totalRow > 0)
-                {
-                    writeTolog(region + "Campign Performance Report " + reportDate + " is already exist in database");
-                    completed = true;
-                }
-                */
         }
 
         #endregion
