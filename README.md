@@ -1,5 +1,6 @@
 ### SKQuotes
-群益自動收集Tick程式 Automatic Quote Machine. 僅適用於期貨, 目前無股票
+群益自動收集Tick程式 Automatic Quote Machine. </br>
+僅適用於台指期, 目前無股票自動報價功能 </br>
 此程式並非用來看盤, 主要用於載tick時做盤中的策略下單
 
 群益 API 官網
