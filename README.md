@@ -19,7 +19,7 @@
 
 ### 使用方法
 1. 安裝SKCOM裡的dll, 右鍵執行install.bat
-2. 將query裡所需要用到的table, function procedure 建好
+2. 將程式裡所需要用到的DB還原(https://github.com/hanyang0721/Stock-Database.git)
 3. 將powershell stopprocess.ps放在適當位置, 如SQL agent偵測到沒有新tick時會透過這個ps重啟程式
 4. 新建一個SQL agent job跑 <b>ChkTick</b> at 8:45
 5. 填入exe.config裡的參數
