@@ -9,7 +9,7 @@
 ### Working Enviroment 
 * Windows 10 Professional (64-bit)</br>
 * Microsoft SQL Server 2016 Developer (64-bit)
-* 群益API 版本2.13.16, 必要環境輔助安裝工具 (Visual C++ 可轉發套件)
+* 群益API 版本2.13.16, 必要環境輔助安裝工具 (Visual C++ 可轉發套件) https://www.microsoft.com/en-us/download/confirmation.aspx?id=26999
 
 ### 提供功能:
 1. 程式啟動後會自動做登入動作, 無須操作即可將Tick load到database
