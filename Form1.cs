@@ -7,6 +7,7 @@ using SKCOMLib;
 using System.Configuration;
 using System.Data.SqlClient;
 using System.Data;
+using SKQuote;
 
 namespace SKCOMTester
 {
@@ -26,7 +27,10 @@ namespace SKCOMTester
 
         public int KLineProcessCount;
         private string connectionstr = ConfigurationManager.AppSettings.Get("Connectionstring");
+        //private int tradesession = Convert.ToInt16(ConfigurationManager.AppSettings.Get("TradeSession"));
 
+
+        Utilties util = new Utilties();
 
         #endregion
 
@@ -53,23 +57,31 @@ namespace SKCOMTester
 
             txtAccount.Text = System.Configuration.ConfigurationManager.AppSettings.Get("Username");
             txtPassWord.Text = System.Configuration.ConfigurationManager.AppSettings.Get("Password");
+
+            StatusListBox.Items.Add("DB Conn: " + connectionstr);
+            StatusListBox.Items.Add("TradeSession: " + (util.GetTradeSession() == 1? "AM盤":"全盤" ));
+
+            util.RecordLog(connectionstr, "SKQuote login, Session:"+ (util.GetTradeSession() == 1 ? "Morning session" : "Night session"));
         }
 
         #endregion
 
+        //KLineProcessCount 2 means Minute and Day KLine check is completed
         private void Form1_Load(object sender, EventArgs e)
         {
             Process[] processes = Process.GetProcessesByName("SKQuote");
             if (processes.Length > 1)
             {
                 MessageBox.Show("SKQuote is already open", "Warning", MessageBoxButtons.OK);
-                //processes[0].CloseMainWindow();
+                util.RecordLog(connectionstr, "SKQuote is already open");
                 Application.Exit();
             }
             else
             {
                 KLineProcessCount = 0;
 
+                //  Timer 1 : Tick 
+                //  Timer 2 : Import Daily, Minute KLine
                 timer1.Interval = 10000;
                 timer1.Enabled = true;
 
@@ -84,6 +96,8 @@ namespace SKCOMTester
                 getbtnConnect.PerformClick();//登入報價系統
             }
         }
+
+
 
         private void btnInitialize_Click(object sender, EventArgs e)
         {
@@ -102,34 +116,18 @@ namespace SKCOMTester
         public void WriteMessage(string strMsg)
         {
             listInformation.Items.Add(strMsg);
-
             listInformation.SelectedIndex = listInformation.Items.Count - 1;
-
-            //listInformation.HorizontalScrollbar = true;
-
-            // Create a Graphics object to use when determining the size of the largest item in the ListBox.
             Graphics g = listInformation.CreateGraphics();
-
-            // Determine the size for HorizontalExtent using the MeasureString method using the last item in the list.
             int hzSize = (int)g.MeasureString(listInformation.Items[listInformation.Items.Count - 1].ToString(), listInformation.Font).Width;
-            // Set the HorizontalExtent property.
             listInformation.HorizontalExtent = hzSize;
         }
 
         public void WriteMessage(int nCode)
         {
             listInformation.Items.Add( m_pSKCenter.SKCenterLib_GetReturnCodeMessage(nCode) );
-
             listInformation.SelectedIndex = listInformation.Items.Count - 1;
-
-            //listInformation.HorizontalScrollbar = true;
-
-            // Create a Graphics object to use when determining the size of the largest item in the ListBox.
             Graphics g = listInformation.CreateGraphics();
-
-            // Determine the size for HorizontalExtent using the MeasureString method using the last item in the list.
             int hzSize = (int)g.MeasureString(listInformation.Items[listInformation.Items.Count - 1].ToString(), listInformation.Font).Width;
-            // Set the HorizontalExtent property.
             listInformation.HorizontalExtent = hzSize;
         }
 
@@ -171,83 +169,97 @@ namespace SKCOMTester
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            Button getbtnTick = skQuote1.Controls.Find("btnTicks", true).FirstOrDefault() as Button;
-            getbtnTick.PerformClick();
-            if (skQuote1.b_TickRunning)
+            //If ticks already running, stop the timer
+            if (skQuote1.TickRunning)
             {
-                timer1.Enabled = false;//Tick come first, then check minite, daily table
+                timer1.Enabled = false;
+            }
+            else
+            {
+                Button getbtnTick = skQuote1.Controls.Find("btnTicks", true).FirstOrDefault() as Button;
+                getbtnTick.PerformClick();
+                util.RecordLog(connectionstr, "Downloading Ticks");
             }
         }
 
         private void timer2_Tick(object sender, EventArgs e)
         {
-           int returnval = 1;
+            //0 Will not do any Kline download
+           int returnval = 0;
+           int KLineType = -1;//decide which Kline to be download later           
+                   
+           TabControl gettabcontrol = skQuote1.Controls.Find("tabControl1", true).FirstOrDefault() as TabControl;
+           gettabcontrol.SelectedIndex = 2; //Switch to KLine download panel
 
+           if (KLineProcessCount==0)//Check if daily table has latest K bar
+           {
+               using (SqlConnection conn = new SqlConnection(connectionstr))
+               {
+                   SqlCommand sqlcmd = new SqlCommand();
+                   sqlcmd.CommandText = "EXEC dbo.sp_ChkLatest_KLine @Chktype=0";//Chktype check daily
+                   sqlcmd.Connection = conn;
+                   sqlcmd.CommandType = CommandType.Text;
+                   try
+                   {
+                       conn.Open();
+                       returnval = (int)sqlcmd.ExecuteScalar();
+                       KLineType = 4;
+                   }
+                    catch (Exception ex)
+                    {
+                        util.RecordLog(connectionstr, ex.Message);
+                    }
+                }
+           }
+           else //Check if minute table has latest K bar
+           {
+               using (SqlConnection conn = new SqlConnection(connectionstr))
+               {
+                   SqlCommand sqlcmd = new SqlCommand();
+                   // Chktype check minute, 1 - GetTradeSession is because I need flip 1 and 0 since Capital has a oppiste definition for trade session
+                   sqlcmd.CommandText = "EXEC dbo.sp_ChkLatest_KLine @Chktype=1, @Session=" + (1- util.GetTradeSession());
+                   sqlcmd.Connection = conn;
+                   sqlcmd.CommandType = CommandType.Text;
+                   try
+                   {
+                       conn.Open();
+                       returnval = (int)sqlcmd.ExecuteScalar();
+                       KLineType = 0;
+                   }
+                   catch(Exception ex)
+                   {
+                        util.RecordLog(connectionstr, ex.Message);
+                   }
+               }
+           }
+           //If it doens't have the latest k bar, trigger the button to download
+           if (returnval == 1)
+           {
+               ComboBox getCombo1 = skQuote1.Controls.Find("searchtype2", true).FirstOrDefault() as ComboBox;
+               ComboBox getCombo2 = skQuote1.Controls.Find("boxKLine", true).FirstOrDefault() as ComboBox;
+               ComboBox getCombo3 = skQuote1.Controls.Find("boxOutType", true).FirstOrDefault() as ComboBox;
+               ComboBox getCombo4 = skQuote1.Controls.Find("boxTradeSession", true).FirstOrDefault() as ComboBox;
+               getCombo1.SelectedIndex = 0;//Query by stockNo
+               getCombo2.SelectedIndex = KLineType;
+               getCombo3.SelectedIndex = 0;//舊版格式
+               getCombo4.SelectedIndex = util.GetTradeSession();//0: 全盤 1:AM盤
+               Button getbtnTick = skQuote1.Controls.Find("btnKLine", true).FirstOrDefault() as Button;
+               getbtnTick.PerformClick();
+               WriteMessage("【KLine】 Downaloaded " + (KLineType == 0 ? "Minute" : "Daily") + " Complete" );
+               util.RecordLog(connectionstr, "KLine Downaloaded " + (KLineType == 0 ? "Minute" : "Daily") + " Complete");
+           }
+           KLineProcessCount++;
+
+           //Switch the tabControl back to Tick tab when KLine import is finished, 
+           //Though it's not necessary to do it
+           
            if (KLineProcessCount > 1)
            {
-                timer2.Enabled = false;
-                TabControl gettabcontrol = skQuote1.Controls.Find("tabControl1", true).FirstOrDefault() as TabControl;
-                gettabcontrol.SelectedIndex = 1;
-                WriteMessage("【KLine】 Minute and Daily table check complete");
-            }
-           else if (TimeSpan.Parse(DateTime.Now.ToString("HH:mm")) >= TimeSpan.Parse("08:45") && TimeSpan.Parse(DateTime.Now.ToString("HH:mm")) <= TimeSpan.Parse("08:50"))
-           {
-                TabControl gettabcontrol = skQuote1.Controls.Find("tabControl1", true).FirstOrDefault() as TabControl;
-                gettabcontrol.SelectedIndex=2;
-                int KLineType=0;
-                if(KLineProcessCount==0)//Check if daily table has latest K bar
-                {
-                    using (SqlConnection conn = new SqlConnection(connectionstr))
-                    {
-                        SqlCommand sqlcmd = new SqlCommand();
-                        sqlcmd.CommandText = "EXEC Stock.dbo.sp_ChkLatest_KLine @Chktype=0";//Chktype check daily
-                        sqlcmd.Connection = conn;
-                        sqlcmd.CommandType = CommandType.Text;
-                        try
-                        {
-                            conn.Open();
-                            returnval = (int)sqlcmd.ExecuteScalar();
-                            KLineType = 4;
-                        }
-                        catch (Exception ex)
-                        {}
-                    }
-                }
-                else  //Check if minute table has latest K bar
-                {
-                    using (SqlConnection conn = new SqlConnection(connectionstr))
-                    {
-                        SqlCommand sqlcmd = new SqlCommand();
-                        sqlcmd.CommandText = "EXEC Stock.dbo.sp_ChkLatest_KLine @Chktype=1";//Chktype check minute
-                        sqlcmd.Connection = conn;
-                        sqlcmd.CommandType = CommandType.Text;
-                        try
-                        {
-                            conn.Open();
-                            returnval = (int)sqlcmd.ExecuteScalar();
-                            KLineType = 0;
-                        }
-                        catch (Exception ex)
-                        {}
-                    }
-                }
-                //If it doens't have the latest k bar, trigger the button to download
-                if (returnval == 1)
-                {
-                    ComboBox getCombo1 = skQuote1.Controls.Find("searchtype2", true).FirstOrDefault() as ComboBox;
-                    ComboBox getCombo2 = skQuote1.Controls.Find("boxKLine", true).FirstOrDefault() as ComboBox;
-                    ComboBox getCombo3 = skQuote1.Controls.Find("boxOutType", true).FirstOrDefault() as ComboBox;
-                    ComboBox getCombo4 = skQuote1.Controls.Find("boxTradeSession", true).FirstOrDefault() as ComboBox;
-                    getCombo1.SelectedIndex = 0;
-                    getCombo2.SelectedIndex = KLineType;
-                    getCombo3.SelectedIndex = 0;
-                    getCombo4.SelectedIndex = 1;
-                    Button getbtnTick = skQuote1.Controls.Find("btnKLine", true).FirstOrDefault() as Button;
-                    getbtnTick.PerformClick();
-                    WriteMessage("【KLine】 Downaloaded " + (KLineType == 0 ? "Minute" : "Daily") + " Complete" );
-                }
-            }
-           KLineProcessCount++;
+               timer2.Enabled = false;
+               gettabcontrol.SelectedIndex = 1;
+               WriteMessage("【KLine】 Minute and Daily table check complete");
+               util.RecordLog(connectionstr, "KLine Minute and Daily table check complete");
+           }
         }
     }
 }

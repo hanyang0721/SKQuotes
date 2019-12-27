@@ -42,7 +42,6 @@
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.searchtype2 = new System.Windows.Forms.ComboBox();
             this.boxTradeSession = new System.Windows.Forms.ComboBox();
-            this.btnKLineAM = new System.Windows.Forms.Button();
             this.boxOutType = new System.Windows.Forms.ComboBox();
             this.listKLine = new System.Windows.Forms.ListBox();
             this.btnKLine = new System.Windows.Forms.Button();
@@ -176,7 +175,6 @@
             // 
             this.tabPage3.Controls.Add(this.searchtype2);
             this.tabPage3.Controls.Add(this.boxTradeSession);
-            this.tabPage3.Controls.Add(this.btnKLineAM);
             this.tabPage3.Controls.Add(this.boxOutType);
             this.tabPage3.Controls.Add(this.listKLine);
             this.tabPage3.Controls.Add(this.btnKLine);
@@ -194,9 +192,9 @@
             // 
             this.searchtype2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.searchtype2.FormattingEnabled = true;
-            this.searchtype2.Location = new System.Drawing.Point(55, 23);
+            this.searchtype2.Location = new System.Drawing.Point(133, 16);
             this.searchtype2.Name = "searchtype2";
-            this.searchtype2.Size = new System.Drawing.Size(121, 23);
+            this.searchtype2.Size = new System.Drawing.Size(136, 23);
             this.searchtype2.TabIndex = 11;
             // 
             // boxTradeSession
@@ -206,21 +204,10 @@
             this.boxTradeSession.Items.AddRange(new object[] {
             "0 = 全盤K線(國內期選用)",
             "1 = AM盤K線(國內期選用)"});
-            this.boxTradeSession.Location = new System.Drawing.Point(519, 23);
+            this.boxTradeSession.Location = new System.Drawing.Point(308, 47);
             this.boxTradeSession.Name = "boxTradeSession";
-            this.boxTradeSession.Size = new System.Drawing.Size(163, 23);
+            this.boxTradeSession.Size = new System.Drawing.Size(196, 23);
             this.boxTradeSession.TabIndex = 10;
-            // 
-            // btnKLineAM
-            // 
-            this.btnKLineAM.Font = new System.Drawing.Font("Yu Gothic UI", 9.5F);
-            this.btnKLineAM.Location = new System.Drawing.Point(708, 62);
-            this.btnKLineAM.Name = "btnKLineAM";
-            this.btnKLineAM.Size = new System.Drawing.Size(106, 25);
-            this.btnKLineAM.TabIndex = 9;
-            this.btnKLineAM.Text = "Query全盤";
-            this.btnKLineAM.UseVisualStyleBackColor = true;
-            this.btnKLineAM.Click += new System.EventHandler(this.btnKLineAM_Click);
             // 
             // boxOutType
             // 
@@ -229,9 +216,9 @@
             this.boxOutType.Items.AddRange(new object[] {
             "0 = 舊版輸出格式",
             "1 = 新版輸出格式"});
-            this.boxOutType.Location = new System.Drawing.Point(362, 24);
+            this.boxOutType.Location = new System.Drawing.Point(308, 16);
             this.boxOutType.Name = "boxOutType";
-            this.boxOutType.Size = new System.Drawing.Size(139, 23);
+            this.boxOutType.Size = new System.Drawing.Size(196, 23);
             this.boxOutType.TabIndex = 8;
             // 
             // listKLine
@@ -239,19 +226,19 @@
             this.listKLine.Font = new System.Drawing.Font("PMingLiU", 13F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             this.listKLine.FormattingEnabled = true;
             this.listKLine.ItemHeight = 17;
-            this.listKLine.Location = new System.Drawing.Point(55, 104);
+            this.listKLine.Location = new System.Drawing.Point(55, 76);
             this.listKLine.Name = "listKLine";
-            this.listKLine.Size = new System.Drawing.Size(768, 242);
+            this.listKLine.Size = new System.Drawing.Size(768, 174);
             this.listKLine.TabIndex = 7;
             // 
             // btnKLine
             // 
             this.btnKLine.Font = new System.Drawing.Font("Yu Gothic UI", 9.5F);
-            this.btnKLine.Location = new System.Drawing.Point(708, 24);
+            this.btnKLine.Location = new System.Drawing.Point(550, 16);
             this.btnKLine.Name = "btnKLine";
-            this.btnKLine.Size = new System.Drawing.Size(106, 25);
+            this.btnKLine.Size = new System.Drawing.Size(273, 54);
             this.btnKLine.TabIndex = 6;
-            this.btnKLine.Text = "Query 早盤";
+            this.btnKLine.Text = "Query (SKQuoteLib_RequestKLineAM)";
             this.btnKLine.UseVisualStyleBackColor = true;
             this.btnKLine.Click += new System.EventHandler(this.btnKLine_Click);
             // 
@@ -267,14 +254,14 @@
             "4 =完整日線。",
             "5 =週線。",
             "6 =月線。"});
-            this.boxKLine.Location = new System.Drawing.Point(210, 23);
+            this.boxKLine.Location = new System.Drawing.Point(133, 47);
             this.boxKLine.Name = "boxKLine";
-            this.boxKLine.Size = new System.Drawing.Size(121, 23);
+            this.boxKLine.Size = new System.Drawing.Size(136, 23);
             this.boxKLine.TabIndex = 5;
             // 
             // txtKLine
             // 
-            this.txtKLine.Location = new System.Drawing.Point(55, 62);
+            this.txtKLine.Location = new System.Drawing.Point(55, 16);
             this.txtKLine.Name = "txtKLine";
             this.txtKLine.Size = new System.Drawing.Size(63, 25);
             this.txtKLine.TabIndex = 4;
@@ -400,7 +387,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 25);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(891, 430);
+            this.tabPage1.Size = new System.Drawing.Size(891, 371);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Quote";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -410,7 +397,7 @@
             this.searchtype.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.searchtype.Font = new System.Drawing.Font("Yu Gothic UI", 9.75F);
             this.searchtype.FormattingEnabled = true;
-            this.searchtype.Location = new System.Drawing.Point(17, 42);
+            this.searchtype.Location = new System.Drawing.Point(17, 45);
             this.searchtype.Name = "searchtype";
             this.searchtype.Size = new System.Drawing.Size(150, 25);
             this.searchtype.TabIndex = 14;
@@ -428,7 +415,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(809, 16);
+            this.label1.Location = new System.Drawing.Point(780, 20);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(54, 15);
             this.label1.TabIndex = 12;
@@ -436,7 +423,7 @@
             // 
             // UserPagetxt
             // 
-            this.UserPagetxt.Location = new System.Drawing.Point(195, 42);
+            this.UserPagetxt.Location = new System.Drawing.Point(195, 45);
             this.UserPagetxt.Name = "UserPagetxt";
             this.UserPagetxt.Size = new System.Drawing.Size(46, 25);
             this.UserPagetxt.TabIndex = 11;
@@ -457,21 +444,21 @@
             dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this.gridStocks.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this.gridStocks.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.gridStocks.Location = new System.Drawing.Point(6, 89);
+            this.gridStocks.Location = new System.Drawing.Point(17, 89);
             this.gridStocks.Name = "gridStocks";
             this.gridStocks.ReadOnly = true;
             this.gridStocks.RowHeadersVisible = false;
             dataGridViewCellStyle4.Font = new System.Drawing.Font("PMingLiU", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             this.gridStocks.RowsDefaultCellStyle = dataGridViewCellStyle4;
             this.gridStocks.RowTemplate.Height = 24;
-            this.gridStocks.Size = new System.Drawing.Size(879, 296);
+            this.gridStocks.Size = new System.Drawing.Size(817, 262);
             this.gridStocks.TabIndex = 10;
             this.gridStocks.CellPainting += new System.Windows.Forms.DataGridViewCellPaintingEventHandler(this.gridStocks_CellPainting);
             // 
             // txtPageNo
             // 
             this.txtPageNo.Enabled = false;
-            this.txtPageNo.Location = new System.Drawing.Point(817, 40);
+            this.txtPageNo.Location = new System.Drawing.Point(783, 41);
             this.txtPageNo.Name = "txtPageNo";
             this.txtPageNo.Size = new System.Drawing.Size(46, 25);
             this.txtPageNo.TabIndex = 9;
@@ -479,7 +466,7 @@
             // 
             // txtStocks
             // 
-            this.txtStocks.Location = new System.Drawing.Point(278, 39);
+            this.txtStocks.Location = new System.Drawing.Point(278, 44);
             this.txtStocks.Name = "txtStocks";
             this.txtStocks.Size = new System.Drawing.Size(243, 25);
             this.txtStocks.TabIndex = 5;
@@ -498,7 +485,7 @@
             // btnQueryStocks
             // 
             this.btnQueryStocks.Font = new System.Drawing.Font("Yu Gothic UI", 9.75F);
-            this.btnQueryStocks.Location = new System.Drawing.Point(678, 38);
+            this.btnQueryStocks.Location = new System.Drawing.Point(653, 42);
             this.btnQueryStocks.Name = "btnQueryStocks";
             this.btnQueryStocks.Size = new System.Drawing.Size(75, 25);
             this.btnQueryStocks.TabIndex = 7;
@@ -535,7 +522,7 @@
             this.tabControl1.Location = new System.Drawing.Point(8, 68);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(899, 459);
+            this.tabControl1.Size = new System.Drawing.Size(899, 400);
             this.tabControl1.TabIndex = 47;
             // 
             // SKQuote
@@ -551,7 +538,7 @@
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.button1);
             this.Name = "SKQuote";
-            this.Size = new System.Drawing.Size(907, 528);
+            this.Size = new System.Drawing.Size(907, 466);
             this.Load += new System.EventHandler(this.SKQuote_Load);
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
@@ -613,6 +600,5 @@
         private System.Windows.Forms.ComboBox searchtype2;
         private System.Windows.Forms.ComboBox searchtype;
         private System.Windows.Forms.ComboBox boxTradeSession;
-        private System.Windows.Forms.Button btnKLineAM;
     }
 }

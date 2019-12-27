@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using SKCOMLib;
 using System.Data.SqlClient;
 using System.Configuration;
+using SKQuote;
 
 namespace SKCOMTester
 {
@@ -16,7 +17,6 @@ namespace SKCOMTester
         // Define Variable
         //----------------------------------------------------------------------
         private bool m_bfirst = true;
-        public bool b_TickRunning = true;
         private int m_nCode;
         private int m_nSimulateStock;
         private string connectionstr = ConfigurationManager.AppSettings.Get("Connectionstring");
@@ -24,48 +24,11 @@ namespace SKCOMTester
         public delegate void MyMessageHandler(string strType, int nCode, string strMessage);
         public event MyMessageHandler GetMessage;
 
-        SKCOMLib.SKQuoteLib m_SKQuoteLib = null;
-        SKCOMLib.SKQuoteLib m_SKQuoteLib2 = null;
-        public SKQuoteLib SKQuoteLib
-        {
-            get { return m_SKQuoteLib; }
-            set { m_SKQuoteLib = value;}
-        }
-        public SKQuoteLib SKQuoteLib2
-        {
-            get { return m_SKQuoteLib2; }
-            set { m_SKQuoteLib2 = value;}
-        }
-
-        public string m_strLoginID = "";
-        public string LoginID
-        {
-            get { return m_strLoginID; }
-            set
-            {
-                m_strLoginID = value;
-            }
-        }
-
-        public bool TickRunning
-        {
-            get { return b_TickRunning; }
-            set
-            {
-                b_TickRunning = value;
-            }
-        }
-
-
-        public string m_strLoginID2 = "";
-        public string LoginID2
-        {
-            get { return m_strLoginID2; }
-            set
-            {
-                m_strLoginID2 = value;
-            }
-        }
+        public SKQuoteLib SKQuoteLib { get; set; } = null;
+        public SKQuoteLib SKQuoteLib2 { get; set; } = null;
+        public string LoginID { get; set; } = "";
+        public string LoginID2 { get; set; } = "";
+        public bool TickRunning { get; set; } = false;
 
         private DataTable m_dtStocks;
         private DataTable m_dtBest5Ask;
@@ -82,6 +45,8 @@ namespace SKCOMTester
         SqlParameter nClosepara = new SqlParameter();
         SqlParameter nQtypara = new SqlParameter();
 
+        Utilties util = new Utilties();
+
         #endregion
 
         #region Initialize
@@ -91,11 +56,13 @@ namespace SKCOMTester
         public SKQuote()
         {
             InitializeComponent();
-           
         }
 
         private void SKQuote_Load(object sender, EventArgs e)
         {
+
+            
+
             tabControl1.SelectedTab = tabPage2;
 
             m_dtStocks = CreateStocksDataTable();
@@ -144,16 +111,16 @@ namespace SKCOMTester
         {
             if (m_bfirst == true)
             {
-                m_SKQuoteLib.OnConnection += new _ISKQuoteLibEvents_OnConnectionEventHandler(m_SKQuoteLib_OnConnection);
-                m_SKQuoteLib.OnNotifyQuote += new _ISKQuoteLibEvents_OnNotifyQuoteEventHandler(m_SKQuoteLib_OnNotifyQuote);
-                m_SKQuoteLib.OnNotifyHistoryTicks += new _ISKQuoteLibEvents_OnNotifyHistoryTicksEventHandler(m_SKQuoteLib_OnNotifyHistoryTicks);
-                m_SKQuoteLib.OnNotifyTicks += new _ISKQuoteLibEvents_OnNotifyTicksEventHandler(m_SKQuoteLib_OnNotifyTicks);
-                m_SKQuoteLib.OnNotifyBest5 += new _ISKQuoteLibEvents_OnNotifyBest5EventHandler(m_SKQuoteLib_OnNotifyBest5);
-                m_SKQuoteLib.OnNotifyKLineData += new _ISKQuoteLibEvents_OnNotifyKLineDataEventHandler(m_SKQuoteLib_OnNotifyKLineData);
-                m_SKQuoteLib.OnNotifyServerTime += new _ISKQuoteLibEvents_OnNotifyServerTimeEventHandler(m_SKQuoteLib_OnNotifyServerTime);
+                SKQuoteLib.OnConnection += new _ISKQuoteLibEvents_OnConnectionEventHandler(m_SKQuoteLib_OnConnection);
+                SKQuoteLib.OnNotifyQuote += new _ISKQuoteLibEvents_OnNotifyQuoteEventHandler(m_SKQuoteLib_OnNotifyQuote);
+                SKQuoteLib.OnNotifyHistoryTicks += new _ISKQuoteLibEvents_OnNotifyHistoryTicksEventHandler(m_SKQuoteLib_OnNotifyHistoryTicks);
+                SKQuoteLib.OnNotifyTicks += new _ISKQuoteLibEvents_OnNotifyTicksEventHandler(m_SKQuoteLib_OnNotifyTicks);
+                SKQuoteLib.OnNotifyBest5 += new _ISKQuoteLibEvents_OnNotifyBest5EventHandler(m_SKQuoteLib_OnNotifyBest5);
+                SKQuoteLib.OnNotifyKLineData += new _ISKQuoteLibEvents_OnNotifyKLineDataEventHandler(m_SKQuoteLib_OnNotifyKLineData);
+                SKQuoteLib.OnNotifyServerTime += new _ISKQuoteLibEvents_OnNotifyServerTimeEventHandler(m_SKQuoteLib_OnNotifyServerTime);
                 m_bfirst = false;
             }
-            m_nCode = m_SKQuoteLib.SKQuoteLib_EnterMonitor();
+            m_nCode = SKQuoteLib.SKQuoteLib_EnterMonitor();
 
             SendReturnMessage("Quote", m_nCode, "SKQuoteLib_EnterMonitor");
         }
@@ -165,7 +132,7 @@ namespace SKCOMTester
 
         private void btnDisconnect_Click(object sender, EventArgs e)
         {
-            m_nCode = m_SKQuoteLib.SKQuoteLib_LeaveMonitor();
+            m_nCode = SKQuoteLib.SKQuoteLib_LeaveMonitor();
 
             SendReturnMessage("Quote", m_nCode, "SKQuoteLib_LeaveMonitor");
         }
@@ -183,7 +150,7 @@ namespace SKCOMTester
                     sqlcmd.ExecuteNonQuery();
                 }
             }
-            catch (Exception ex)
+            catch
             {
 
             }
@@ -208,7 +175,7 @@ namespace SKCOMTester
             GridBest5Bid.Columns["m_nAsk"].HeaderText = "買價";
             GridBest5Bid.Columns["m_nAsk"].Width = 60;
 
-            m_nCode = m_SKQuoteLib.SKQuoteLib_RequestTicks(0, txtTick.Text.Trim());
+            m_nCode = SKQuoteLib.SKQuoteLib_RequestTicks(0, txtTick.Text.Trim());
 
             SendReturnMessage("Quote", m_nCode, "SKQuoteLib_RequestTicks");
         }
@@ -271,7 +238,7 @@ namespace SKCOMTester
 
                     connection.Open();
 
-                    sqlcmd.CommandText = @"SELECT [StockNo] FROM [Stock].[dbo].[StockList] " + sqlwhere;
+                    sqlcmd.CommandText = @"SELECT [StockNo] FROM [dbo].[StockList] " + sqlwhere;
                     sqlcmd.Connection = connection;
                     sqlcmd.CommandType = CommandType.Text;
 
@@ -296,7 +263,7 @@ namespace SKCOMTester
             {
                 SKSTOCK pSKStock = new SKSTOCK();
 
-                int nCode = m_SKQuoteLib.SKQuoteLib_GetStockByNo(s.Trim(), ref pSKStock);
+                int nCode = SKQuoteLib.SKQuoteLib_GetStockByNo(s.Trim(), ref pSKStock);
 
                 OnUpDateDataRow(pSKStock);
 
@@ -306,7 +273,7 @@ namespace SKCOMTester
                 }
             }
 
-            m_nCode = m_SKQuoteLib.SKQuoteLib_RequestStocks(ref sPage, stockstr);
+            m_nCode = SKQuoteLib.SKQuoteLib_RequestStocks(ref sPage, stockstr);
 
             txtPageNo.Text = sPage.ToString();
 
@@ -315,14 +282,14 @@ namespace SKCOMTester
 
         private void btnTickStop_Click(object sender, EventArgs e)
         {
-            m_nCode = m_SKQuoteLib.SKQuoteLib_RequestTicks(50, txtTick.Text.Trim());
+            m_nCode = SKQuoteLib.SKQuoteLib_RequestTicks(50, txtTick.Text.Trim());
 
             SendReturnMessage("Quote", m_nCode, "SKQuoteLib_CancelRequestTicks");
         }
 
         private void btnServerTime_Click(object sender, EventArgs e)
         {
-            m_nCode = m_SKQuoteLib.SKQuoteLib_RequestServerTime();
+            m_nCode = SKQuoteLib.SKQuoteLib_RequestServerTime();
 
             SendReturnMessage("Quote", m_nCode, "SKQuoteLib_RequestServerTime");
         }
@@ -331,8 +298,9 @@ namespace SKCOMTester
         {
             short sKLineType = short.Parse(boxKLine.SelectedIndex.ToString());
             short sOutType = short.Parse(boxOutType.SelectedIndex.ToString());
+            short sTradeSession = short.Parse(boxTradeSession.SelectedIndex.ToString());
 
-            // sKline 4=完整日線
+            //4 =完整日線
             //0 舊版輸出
 
             listKLine.Items.Clear();
@@ -346,7 +314,14 @@ namespace SKCOMTester
                 MessageBox.Show("請選擇輸出格式類型");
                 return;
             }
+            if (sTradeSession < 0)
+            {
+                MessageBox.Show("請選擇輸出盤別");
+                return;
+            }
 
+            //FUNCITON NOT COMPLETED
+            //Download quote based on Page No,
             if (searchtype2.SelectedIndex==1)
             {
                 using (SqlConnection connection = new SqlConnection(connectionstr))
@@ -357,11 +332,9 @@ namespace SKCOMTester
                     int count = 0;
                     string sqlwhere = "";
                     connection.Open();
-
-                    
                     sqlwhere = " WHERE PageNo=" + txtKLine.Text.ToString();
 
-                    sqlcmd.CommandText = @"SELECT [StockNo] FROM [Stock].[dbo].[StockList]" + sqlwhere;
+                    sqlcmd.CommandText = @"SELECT [StockNo] FROM [dbo].[StockList]" + sqlwhere;
                     sqlcmd.Connection = connection;
                     sqlcmd.CommandType = CommandType.Text;
 
@@ -372,9 +345,8 @@ namespace SKCOMTester
                             count++;
                             for (int i = 0; i < reader.FieldCount; i++)
                             {
-                                m_nCode = m_SKQuoteLib.SKQuoteLib_RequestKLine(reader.GetValue(i).ToString(), sKLineType, sOutType);
-
-                                SendReturnMessage("Quote", m_nCode, "SKQuoteLib_RequestKLine");
+                                m_nCode = SKQuoteLib.SKQuoteLib_RequestKLineAM(txtKLine.Text.Trim(), sKLineType, sOutType, sTradeSession);
+                                SendReturnMessage("Quote", m_nCode, "SKQuoteLib_RequestKLineAM");
                             }
                         }
                     }
@@ -382,9 +354,8 @@ namespace SKCOMTester
             }
             else
             {
-                m_nCode = m_SKQuoteLib.SKQuoteLib_RequestKLine(txtKLine.Text.Trim(), sKLineType, sOutType);
-
-                SendReturnMessage("Quote", m_nCode, "SKQuoteLib_RequestKLine");
+                m_nCode = SKQuoteLib.SKQuoteLib_RequestKLineAM(txtKLine.Text.Trim(), sKLineType, sOutType, sTradeSession);
+                SendReturnMessage("Quote", m_nCode, "SKQuoteLib_RequestKLineAM");
             }
         }
 
@@ -437,7 +408,7 @@ namespace SKCOMTester
                     }
                     e.Handled = true;
                 }
-                catch (Exception ex)
+                catch
                 {
 
                 }
@@ -502,7 +473,7 @@ namespace SKCOMTester
         {
             SKSTOCK pSKStock = new SKSTOCK();
 
-            m_SKQuoteLib.SKQuoteLib_GetStockByIndex(sMarketNo, sStockIdx, ref pSKStock);
+            SKQuoteLib.SKQuoteLib_GetStockByIndex(sMarketNo, sStockIdx, ref pSKStock);
 
             OnUpDateDataRow(pSKStock);
         }
@@ -511,15 +482,6 @@ namespace SKCOMTester
         void m_SKQuoteLib_OnNotifyTicks(short sMarketNo, short sStockIdx, int nPtr, int nDate, int lTimehms, int lTimemillismicros, int nBid, int nAsk, int nClose, int nQty, int nSimulate)
         {
             string strData = "";
-            //string strTimeNoMsMs = "";
-            //int nlength = lTime.ToString().Length;
-            //if (nlength >6)
-            //    strTimeNoMsMs = lTime.ToString().Substring(0, nlength - 6);
-            //[-1020-add for h:m:s'millissecond''microsecond][-0219-add Qty-]
-            //string strData = nPtr.ToString() + "," + nTime.ToString() + "," + nBid.ToString() + "," + nAsk.ToString() + "," + nClose.ToString() + "," + nQty.ToString();
-            //if (chkbox_msms.Checked == true)
-            //    strData = sStockIdx.ToString() + "," + nPtr.ToString() + "," + nDate.ToString() + " " + lTimehms.ToString() + "," + nBid.ToString() + "," + nAsk.ToString() + "," + nClose.ToString() + "," + nQty.ToString();
-            //else
             strData = sStockIdx.ToString() + "," + nPtr.ToString() + "," + nDate.ToString() + " " + lTimehms.ToString() + " " + lTimemillismicros.ToString() + "," + nBid.ToString() + "," + nAsk.ToString() + "," + nClose.ToString() + "," + nQty.ToString();
 
             //[揭示]//0:一般;1:試算揭示
@@ -549,7 +511,7 @@ namespace SKCOMTester
                         TickRunning = true;
                     }
                 }
-                catch(Exception ex)
+                catch
                 {}
                 finally
                 {
@@ -592,7 +554,7 @@ namespace SKCOMTester
                         sqlcmd.ExecuteNonQuery();
                     }
                 }
-                catch (Exception ex)
+                catch 
                 {
 
                 }
@@ -621,7 +583,7 @@ namespace SKCOMTester
             SKSTOCK pSKStock = new SKSTOCK();
             double dDigitNum = 0.000;
             string strStockNoTick = txtTick.Text.Trim();
-            int nCode = m_SKQuoteLib.SKQuoteLib_GetStockByNo(strStockNoTick, ref pSKStock);
+            int nCode = SKQuoteLib.SKQuoteLib_GetStockByNo(strStockNoTick, ref pSKStock);
             //[-1022-a-]
             if (nCode == 0)
                 dDigitNum = (Math.Pow(10, pSKStock.sDecimal));
@@ -726,81 +688,88 @@ namespace SKCOMTester
         {
             listKLine.Items.Add("[OnNotifyKLineData]" + bstrData);
 
-            string KLineTpye;
+            string KLineTpye, targettable;
             KLineTpye = boxKLine.SelectedIndex.ToString();
+            //1 AM 盤, 0 全盤
+            targettable = boxTradeSession.SelectedIndex == 1 ? "StockHistoryDaily" : "StockHistoryDaily_ALL"  ;
 
-            using (SqlConnection connection = new SqlConnection(connectionstr))
+            try
             {
-                SqlCommand sqlcmd = new SqlCommand();
-                SqlParameter stockPara = new SqlParameter();
-                SqlParameter datePara = new SqlParameter();
-                SqlParameter timePara = new SqlParameter();
-                SqlParameter openPara = new SqlParameter();
-                SqlParameter highestPara = new SqlParameter();
-                SqlParameter lowestPara = new SqlParameter();
-                SqlParameter closePara = new SqlParameter();
-                SqlParameter volPara = new SqlParameter();
-
-                connection.Open();
-               
-                sqlcmd.Connection = connection;
-                sqlcmd.CommandType = CommandType.Text;
-
-                stockPara = sqlcmd.Parameters.Add("@stockno", SqlDbType.VarChar, 16);
-                datePara = sqlcmd.Parameters.Add("@sdate", SqlDbType.VarChar, 10);
-                openPara = sqlcmd.Parameters.Add("@open", SqlDbType.VarChar, 8);
-                highestPara = sqlcmd.Parameters.Add("@highest", SqlDbType.VarChar, 8);
-                lowestPara = sqlcmd.Parameters.Add("@lowest", SqlDbType.VarChar, 8);
-                closePara = sqlcmd.Parameters.Add("@close", SqlDbType.VarChar, 8);
-                volPara = sqlcmd.Parameters.Add("@vol", SqlDbType.VarChar, 8);
-
-                stockPara.Direction = ParameterDirection.Input;
-                datePara.Direction = ParameterDirection.Input;
-                openPara.Direction = ParameterDirection.Input;
-                highestPara.Direction = ParameterDirection.Input;
-                lowestPara.Direction = ParameterDirection.Input;
-                closePara.Direction = ParameterDirection.Input;
-                volPara.Direction = ParameterDirection.Input;
-
-                string[] sdata=null;
-                if (KLineTpye == "0")
+                using (SqlConnection connection = new SqlConnection(connectionstr))
                 {
-                    //typelength = 6;
-                    timePara = sqlcmd.Parameters.Add("@stime", SqlDbType.VarChar, 6);
-                    timePara.Direction = ParameterDirection.Input;
-                    sdata = bstrData.Split(new Char[] { ',' });
+                    SqlCommand sqlcmd = new SqlCommand();
+                    SqlParameter stockPara = new SqlParameter();
+                    SqlParameter datePara = new SqlParameter();
+                    SqlParameter timePara = new SqlParameter();
+                    SqlParameter openPara = new SqlParameter();
+                    SqlParameter highestPara = new SqlParameter();
+                    SqlParameter lowestPara = new SqlParameter();
+                    SqlParameter closePara = new SqlParameter();
+                    SqlParameter volPara = new SqlParameter();
 
-                    stockPara.Value = bstrStockNo;
-                    datePara.Value = sdata[0];
-                    timePara.Value = sdata[1];
-                    openPara.Value = sdata[2];
-                    highestPara.Value = sdata[3];
-                    lowestPara.Value = sdata[4];
-                    closePara.Value = sdata[5];
-                    volPara.Value = sdata[6];
-                    sqlcmd.CommandText = @" IF NOT EXISTS (SELECT 1 FROM [dbo].StockHisotryMin WHERE stockNo=@stockno AND sdate=@sdate AND stime=@stime)  
-                                    BEGIN  INSERT INTO [dbo].[StockHisotryMin] ([stockNo],[sdate],[stime],[open],[highest],[lowest], [Close],[vol] ) VALUES
+                    connection.Open();
+
+                    sqlcmd.Connection = connection;
+                    sqlcmd.CommandType = CommandType.Text;
+
+                    stockPara = sqlcmd.Parameters.Add("@stockno", SqlDbType.VarChar, 16);
+                    datePara = sqlcmd.Parameters.Add("@sdate", SqlDbType.Date);
+                    openPara = sqlcmd.Parameters.Add("@open", SqlDbType.VarChar, 8);
+                    highestPara = sqlcmd.Parameters.Add("@highest", SqlDbType.VarChar, 8);
+                    lowestPara = sqlcmd.Parameters.Add("@lowest", SqlDbType.VarChar, 8);
+                    closePara = sqlcmd.Parameters.Add("@close", SqlDbType.VarChar, 8);
+                    volPara = sqlcmd.Parameters.Add("@vol", SqlDbType.VarChar, 8);
+
+                    stockPara.Direction = ParameterDirection.Input;
+                    datePara.Direction = ParameterDirection.Input;
+                    openPara.Direction = ParameterDirection.Input;
+                    highestPara.Direction = ParameterDirection.Input;
+                    lowestPara.Direction = ParameterDirection.Input;
+                    closePara.Direction = ParameterDirection.Input;
+                    volPara.Direction = ParameterDirection.Input;
+
+                    string[] sdata = null;
+                    //Minute
+                    if (KLineTpye == "0")
+                    {
+                        //typelength = 6;
+                        timePara = sqlcmd.Parameters.Add("@stime", SqlDbType.VarChar, 6);
+                        timePara.Direction = ParameterDirection.Input;
+                        sdata = bstrData.Split(new Char[] { ',' });
+
+                        stockPara.Value = bstrStockNo;
+                        datePara.Value = sdata[0];
+                        timePara.Value = sdata[1];
+                        openPara.Value = sdata[2];
+                        highestPara.Value = sdata[3];
+                        lowestPara.Value = sdata[4];
+                        closePara.Value = sdata[5];
+                        volPara.Value = sdata[6];
+                        sqlcmd.CommandText = @" IF NOT EXISTS (SELECT 1 FROM [dbo].StockHistoryMin WHERE stockNo=@stockno AND sdate=@sdate AND stime=@stime)  
+                                    BEGIN  INSERT INTO [dbo].[StockHistoryMin] ([stockNo],[sdate],[stime],[open],[highest],[lowest], [Close],[vol] ) VALUES
                                     (@stockno, @sdate,@stime, @open, @highest, @lowest, @close, @vol) END ";
-
+                    }
+                    //Daily
+                    else if (KLineTpye == "4")
+                    {
+                        sdata = bstrData.Split(new Char[] { ',' });
+                        stockPara.Value = bstrStockNo;
+                        datePara.Value = sdata[0];
+                        openPara.Value = sdata[1];
+                        highestPara.Value = sdata[2];
+                        lowestPara.Value = sdata[3];
+                        closePara.Value = sdata[4];
+                        volPara.Value = sdata[5];
+                        sqlcmd.CommandText = "IF NOT EXISTS (SELECT 1 FROM [dbo]." + targettable + " WHERE stockNo=@stockno AND sdate=@sdate)  " +
+                       " BEGIN INSERT INTO [dbo]." + targettable + @" ([stockNo],[sdate],[open],[highest],[lowest], [Close],[vol] )
+                    VALUES (@stockno, @sdate,@open, @highest, @lowest, @close, @vol) END ";
+                    }
+                    sqlcmd.ExecuteNonQuery();
                 }
-                else if(KLineTpye == "4")
-                {
-                    sdata = bstrData.Split(new Char[] { ',' });
-                    stockPara.Value = bstrStockNo;
-                    datePara.Value = sdata[0];
-                    openPara.Value = sdata[1];
-                    highestPara.Value = sdata[2];
-                    lowestPara.Value = sdata[3];
-                    closePara.Value = sdata[4];
-                    volPara.Value = sdata[5];
-                    sqlcmd.CommandText = @"
-                    IF NOT EXISTS (SELECT 1 FROM [dbo].StockHistoryDaily WHERE stockNo=@stockno AND sdate=@sdate) 
-                    BEGIN INSERT INTO [dbo].[StockHistoryDaily] ([stockNo],[sdate],[open],[highest],[lowest], [Close],[vol] )
-                    VALUES
-                    (@stockno, @sdate,@open, @highest, @lowest, @close, @vol) END ";
-
-                }
-                sqlcmd.ExecuteNonQuery();
+            }
+            catch(Exception ex)
+            {
+                util.RecordLog(connectionstr,ex.Message);
             }
         }
 
@@ -1055,7 +1024,7 @@ namespace SKCOMTester
         private void button4_Click(object sender, EventArgs e)
         {
 
-            m_nCode = m_SKQuoteLib.SKQuoteLib_GetMarketBuySellUpDown();
+            m_nCode = SKQuoteLib.SKQuoteLib_GetMarketBuySellUpDown();
             SendReturnMessage("Quote", m_nCode, "SKQuoteLib_RequestMarketBuySellUpDown");
         }
 
@@ -1090,7 +1059,7 @@ namespace SKCOMTester
                 return;
             }
 
-            m_nCode = m_SKQuoteLib.SKQuoteLib_RequestKLineAM(txtKLine.Text.Trim(), sKLineType, sOutType, sTradeSession);
+            m_nCode = SKQuoteLib.SKQuoteLib_RequestKLineAM(txtKLine.Text.Trim(), sKLineType, sOutType, sTradeSession);
 
             SendReturnMessage("Quote", m_nCode, "SKQuoteLib_RequestKLineAM");
             //boxTradeSession
@@ -1101,7 +1070,7 @@ namespace SKCOMTester
             listTicks.Items.Clear();
             
 
-            m_nCode = m_SKQuoteLib.SKQuoteLib_RequestLiveTick(2, txtTick.Text.Trim());
+            m_nCode = SKQuoteLib.SKQuoteLib_RequestLiveTick(2, txtTick.Text.Trim());
 
             SendReturnMessage("Quote", m_nCode, "SKQuoteLib_RequestLiveTick");
         }
@@ -1110,7 +1079,7 @@ namespace SKCOMTester
         {
             //listTicks.Items.Clear();
             
-            m_nCode = m_SKQuoteLib.SKQuoteLib_RequestLiveTick(50, txtTick.Text.Trim());
+            m_nCode = SKQuoteLib.SKQuoteLib_RequestLiveTick(50, txtTick.Text.Trim());
 
             SendReturnMessage("Quote", m_nCode, "SKQuoteLib_CancelLiveTick");
         }
@@ -1127,7 +1096,7 @@ namespace SKCOMTester
 
         private void btnIsConnected_Click(object sender, EventArgs e)
         {
-            int nConnected = m_SKQuoteLib.SKQuoteLib_IsConnected();
+            int nConnected = SKQuoteLib.SKQuoteLib_IsConnected();
 
             if (nConnected == 0)
             {
