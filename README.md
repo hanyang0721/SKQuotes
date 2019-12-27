@@ -13,17 +13,15 @@
 
 ### 提供功能:
 1. 程式啟動後會自動做登入動作, 無須操作即可將Tick load到database
-2. 自動載入前日分K, 日K資料. 判斷僅用weekday-1, 並無特別使用交易日
+2. 自動載入前日分K, 日K資料. 判斷僅用weekday-1, 並無特別使用判別交易日
 3. 使用exe.Config檔參數載入
-4. 在sql agent裡建一個job執行ChkTick, 確認tick使否持續運作, 如果沒有的話就執行ps重啟SKQoute
 
 ### 使用方法
 1. 安裝SKCOM裡的dll, 右鍵執行install.bat
 2. 將程式裡所需要用到的DB還原(https://github.com/hanyang0721/Stock-Database.git)
-3. 將powershell stopprocess.ps放在適當位置, 如SQL agent偵測到沒有新tick時會透過這個ps重啟程式
-4. 新建一個SQL agent job跑 <b>ChkTick</b> at 8:45
-5. 填入exe.config裡的參數
-6. 將程式設定在工作排程裡定時啟用
+3. 修改SKQuote.ps1裡SKQuote的執行路徑, 後建立工作排成定時8:45與15:00啟動 
+4. 填入exe.config裡的參數
+5. 沒事了, 繼續debug
 
 ### 注意事項
 * 程式並不會備份歷史tick, 需自行建job備份
