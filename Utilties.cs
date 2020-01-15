@@ -14,7 +14,7 @@ namespace SKQuote
             using (SqlConnection connection = new SqlConnection(connectionstr))
             {
                 SqlCommand sqlcmd = new SqlCommand();
-                sqlcmd.Parameters.Add(new SqlParameter("message", message));
+                sqlcmd.Parameters.Add(new SqlParameter("message", System.Reflection.Assembly.GetExecutingAssembly().GetName().Name+":"+message));
                 //sqlcmd.Parameters.Add(new SqlParameter("dt", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss:fff")));
                 connection.Open();
                 sqlcmd.Connection = connection;

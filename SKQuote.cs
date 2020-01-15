@@ -60,9 +60,6 @@ namespace SKCOMTester
 
         private void SKQuote_Load(object sender, EventArgs e)
         {
-
-            
-
             tabControl1.SelectedTab = tabPage2;
 
             m_dtStocks = CreateStocksDataTable();
@@ -515,7 +512,7 @@ namespace SKCOMTester
                 {}
                 finally
                 {
-                    listTicks.Items.Add("[OnNotifyTicks]" + strData);
+                    //listTicks.Items.Add("[OnNotifyTicks]" + strData);
                 }
             }
         }
@@ -691,7 +688,7 @@ namespace SKCOMTester
             string KLineTpye, targettable;
             KLineTpye = boxKLine.SelectedIndex.ToString();
             //1 AM 盤, 0 全盤
-            targettable = boxTradeSession.SelectedIndex == 1 ? "StockHistoryDaily" : "StockHistoryDaily_ALL"  ;
+            targettable = boxTradeSession.SelectedIndex == 1 ? "StockHistoryDaily_KLine" : "StockHistoryDaily_ALL_KLine"  ;
 
             try
             {
@@ -745,8 +742,8 @@ namespace SKCOMTester
                         lowestPara.Value = sdata[4];
                         closePara.Value = sdata[5];
                         volPara.Value = sdata[6];
-                        sqlcmd.CommandText = @" IF NOT EXISTS (SELECT 1 FROM [dbo].StockHistoryMin WHERE stockNo=@stockno AND sdate=@sdate AND stime=@stime)  
-                                    BEGIN  INSERT INTO [dbo].[StockHistoryMin] ([stockNo],[sdate],[stime],[open],[highest],[lowest], [Close],[vol] ) VALUES
+                        sqlcmd.CommandText = @" IF NOT EXISTS (SELECT 1 FROM [dbo].StockHistoryMin_KLine WHERE stockNo=@stockno AND sdate=@sdate AND stime=@stime)  
+                                    BEGIN  INSERT INTO [dbo].[StockHistoryMin_KLine] ([stockNo],[sdate],[stime],[open],[highest],[lowest], [Close],[vol] ) VALUES
                                     (@stockno, @sdate,@stime, @open, @highest, @lowest, @close, @vol) END ";
                     }
                     //Daily

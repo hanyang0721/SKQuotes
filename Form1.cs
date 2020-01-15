@@ -8,6 +8,7 @@ using System.Configuration;
 using System.Data.SqlClient;
 using System.Data;
 using SKQuote;
+using System.Collections.Generic;
 
 namespace SKCOMTester
 {
@@ -28,7 +29,6 @@ namespace SKCOMTester
         public int KLineProcessCount;
         private string connectionstr = ConfigurationManager.AppSettings.Get("Connectionstring");
         //private int tradesession = Convert.ToInt16(ConfigurationManager.AppSettings.Get("TradeSession"));
-
 
         Utilties util = new Utilties();
 
@@ -78,30 +78,32 @@ namespace SKCOMTester
             }
             else
             {
-                KLineProcessCount = 0;
-
-                //  Timer 1 : Tick 
-                //  Timer 2 : Import Daily, Minute KLine
-                timer1.Interval = 10000;
-                timer1.Enabled = true;
-
-                timer2.Interval = 20000;
-                timer2.Enabled = true;
+                //Timer 1 : Tick 
+                //Timer 2 : Import Daily, Minute KLine
+                string[] args = Environment.GetCommandLineArgs();
+                if (args.Length > 1)
+                {
+                    if (args[1].Equals("-KLine", StringComparison.InvariantCultureIgnoreCase))
+                        KLineProcessCount = 0;
+                    timer2.Interval = 60000;
+                    timer2.Enabled = true;
+                }
+                else
+                {
+                    timer1.Interval = 10000;
+                    timer1.Enabled = true;
+                }
 
                 btnInitialize.PerformClick();//登入群益系統
                 m_pSKCenter.SKCenterLib_SetLogPath(AppDomain.CurrentDomain.BaseDirectory.ToString() + "log\\");
                 //this.Controls.Add(skQuote1);
                 Button getbtnConnect = skQuote1.Controls.Find("button1", true).FirstOrDefault() as Button;
-            
                 getbtnConnect.PerformClick();//登入報價系統
             }
         }
 
-
-
         private void btnInitialize_Click(object sender, EventArgs e)
         {
-            
             m_nCode = m_pSKCenter.SKCenterLib_Login(txtAccount.Text.Trim().ToUpper(), txtPassWord.Text.Trim());
 
             if (m_nCode == 0)
@@ -141,7 +143,7 @@ namespace SKCOMTester
             WriteMessage("【" + strType + "】【" + strMessage + "】【" + m_pSKCenter.SKCenterLib_GetReturnCodeMessage(nCode) + "】" + strInfo);
         }
 
-        void OnShowAgreement(string strData)
+        private void OnShowAgreement(string strData)
         {
             MessageBox.Show(strData);
         }
@@ -161,12 +163,6 @@ namespace SKCOMTester
                 WriteMessage(m_nCode);
         }
 
-        private void button1_Click_1(object sender, EventArgs e)
-        {
-            Button getbtnTick = skQuote1.Controls.Find("btnTicks", true).FirstOrDefault() as Button;
-            getbtnTick.PerformClick();
-        }
-
         private void timer1_Tick(object sender, EventArgs e)
         {
             //If ticks already running, stop the timer
@@ -184,82 +180,35 @@ namespace SKCOMTester
 
         private void timer2_Tick(object sender, EventArgs e)
         {
-            //0 Will not do any Kline download
-           int returnval = 0;
-           int KLineType = -1;//decide which Kline to be download later           
-                   
-           TabControl gettabcontrol = skQuote1.Controls.Find("tabControl1", true).FirstOrDefault() as TabControl;
-           gettabcontrol.SelectedIndex = 2; //Switch to KLine download panel
+            DownloadKLine(KLineProcessCount);
+            KLineProcessCount++;
 
-           if (KLineProcessCount==0)//Check if daily table has latest K bar
-           {
-               using (SqlConnection conn = new SqlConnection(connectionstr))
-               {
-                   SqlCommand sqlcmd = new SqlCommand();
-                   sqlcmd.CommandText = "EXEC dbo.sp_ChkLatest_KLine @Chktype=0";//Chktype check daily
-                   sqlcmd.Connection = conn;
-                   sqlcmd.CommandType = CommandType.Text;
-                   try
-                   {
-                       conn.Open();
-                       returnval = (int)sqlcmd.ExecuteScalar();
-                       KLineType = 4;
-                   }
-                    catch (Exception ex)
-                    {
-                        util.RecordLog(connectionstr, ex.Message);
-                    }
-                }
-           }
-           else //Check if minute table has latest K bar
-           {
-               using (SqlConnection conn = new SqlConnection(connectionstr))
-               {
-                   SqlCommand sqlcmd = new SqlCommand();
-                   // Chktype check minute, 1 - GetTradeSession is because I need flip 1 and 0 since Capital has a oppiste definition for trade session
-                   sqlcmd.CommandText = "EXEC dbo.sp_ChkLatest_KLine @Chktype=1, @Session=" + (1- util.GetTradeSession());
-                   sqlcmd.Connection = conn;
-                   sqlcmd.CommandType = CommandType.Text;
-                   try
-                   {
-                       conn.Open();
-                       returnval = (int)sqlcmd.ExecuteScalar();
-                       KLineType = 0;
-                   }
-                   catch(Exception ex)
-                   {
-                        util.RecordLog(connectionstr, ex.Message);
-                   }
-               }
-           }
-           //If it doens't have the latest k bar, trigger the button to download
-           if (returnval == 1)
-           {
-               ComboBox getCombo1 = skQuote1.Controls.Find("searchtype2", true).FirstOrDefault() as ComboBox;
-               ComboBox getCombo2 = skQuote1.Controls.Find("boxKLine", true).FirstOrDefault() as ComboBox;
-               ComboBox getCombo3 = skQuote1.Controls.Find("boxOutType", true).FirstOrDefault() as ComboBox;
-               ComboBox getCombo4 = skQuote1.Controls.Find("boxTradeSession", true).FirstOrDefault() as ComboBox;
-               getCombo1.SelectedIndex = 0;//Query by stockNo
-               getCombo2.SelectedIndex = KLineType;
-               getCombo3.SelectedIndex = 0;//舊版格式
-               getCombo4.SelectedIndex = util.GetTradeSession();//0: 全盤 1:AM盤
-               Button getbtnTick = skQuote1.Controls.Find("btnKLine", true).FirstOrDefault() as Button;
-               getbtnTick.PerformClick();
-               WriteMessage("【KLine】 Downaloaded " + (KLineType == 0 ? "Minute" : "Daily") + " Complete" );
-               util.RecordLog(connectionstr, "KLine Downaloaded " + (KLineType == 0 ? "Minute" : "Daily") + " Complete");
-           }
-           KLineProcessCount++;
+            if(KLineProcessCount==2)
+            {
+                timer2.Enabled = false;
+                util.RecordLog(connectionstr, "KLine Minute and Daily table check complete");
+            }
+        }
 
-           //Switch the tabControl back to Tick tab when KLine import is finished, 
-           //Though it's not necessary to do it
-           
-           if (KLineProcessCount > 1)
-           {
-               timer2.Enabled = false;
-               gettabcontrol.SelectedIndex = 1;
-               WriteMessage("【KLine】 Minute and Daily table check complete");
-               util.RecordLog(connectionstr, "KLine Minute and Daily table check complete");
-           }
+        private void DownloadKLine(int KLineType)
+        {
+            TabControl gettabcontrol = skQuote1.Controls.Find("tabControl1", true).FirstOrDefault() as TabControl;
+            gettabcontrol.SelectedIndex = 2; //Switch to KLine download panel
+
+            ComboBox getCombo1 = skQuote1.Controls.Find("searchtype2", true).FirstOrDefault() as ComboBox;
+            ComboBox getCombo2 = skQuote1.Controls.Find("boxKLine", true).FirstOrDefault() as ComboBox;
+            ComboBox getCombo3 = skQuote1.Controls.Find("boxOutType", true).FirstOrDefault() as ComboBox;
+            ComboBox getCombo4 = skQuote1.Controls.Find("boxTradeSession", true).FirstOrDefault() as ComboBox;
+            getCombo1.SelectedIndex = 0;//Query by stockNo
+            getCombo2.SelectedIndex = KLineType == 0 ? 0 : 4 ;//0 minutes, 4 daily
+            getCombo3.SelectedIndex = 0;//舊版格式
+            getCombo4.SelectedIndex = util.GetTradeSession();//0: 全盤 1:AM盤
+            Button getbtnTick = skQuote1.Controls.Find("btnKLine", true).FirstOrDefault() as Button;
+            getbtnTick.PerformClick();
+            WriteMessage("【KLine】 Downaloaded " + (KLineType == 0 ? "Minute" : "Daily") + " Complete");
+            util.RecordLog(connectionstr, "KLine Downaloaded " + (KLineType == 0 ? "Minute" : "Daily") + " Complete");
+
+            gettabcontrol.SelectedIndex = 1;
         }
     }
 }
