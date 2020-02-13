@@ -61,7 +61,7 @@ namespace SKCOMTester
             StatusListBox.Items.Add("DB Conn: " + connectionstr);
             StatusListBox.Items.Add("TradeSession: " + (util.GetTradeSession() == 1? "AM盤":"全盤" ));
 
-            util.RecordLog(connectionstr, "SKQuote login, Session:"+ (util.GetTradeSession() == 1 ? "Morning session" : "Night session"));
+            util.RecordLog(connectionstr, "SKQuote login, Session:"+ (util.GetTradeSession() == 1 ? "Morning session" : "Night session"), util.INFO);
         }
 
         #endregion
@@ -73,7 +73,7 @@ namespace SKCOMTester
             if (processes.Length > 1)
             {
                 MessageBox.Show("SKQuote is already open", "Warning", MessageBoxButtons.OK);
-                util.RecordLog(connectionstr, "SKQuote is already open");
+                util.RecordLog(connectionstr, "SKQuote is already open", util.ALARM);
                 Application.Exit();
             }
             else
@@ -174,7 +174,7 @@ namespace SKCOMTester
             {
                 Button getbtnTick = skQuote1.Controls.Find("btnTicks", true).FirstOrDefault() as Button;
                 getbtnTick.PerformClick();
-                util.RecordLog(connectionstr, "Downloading Ticks");
+                util.RecordLog(connectionstr, "Downloading Ticks", util.INFO);
             }
         }
 
@@ -186,7 +186,7 @@ namespace SKCOMTester
             if(KLineProcessCount==2)
             {
                 timer2.Enabled = false;
-                util.RecordLog(connectionstr, "KLine Minute and Daily table check complete");
+                util.RecordLog(connectionstr, "KLine Minute and Daily table import complete", util.INFO);
             }
         }
 
@@ -206,7 +206,7 @@ namespace SKCOMTester
             Button getbtnTick = skQuote1.Controls.Find("btnKLine", true).FirstOrDefault() as Button;
             getbtnTick.PerformClick();
             WriteMessage("【KLine】 Downaloaded " + (KLineType == 0 ? "Minute" : "Daily") + " Complete");
-            util.RecordLog(connectionstr, "KLine Downaloaded " + (KLineType == 0 ? "Minute" : "Daily") + " Complete");
+            util.RecordLog(connectionstr, "KLine Downaloaded " + (KLineType == 0 ? "Minute" : "Daily") + " Complete", util.INFO);
 
             gettabcontrol.SelectedIndex = 1;
         }

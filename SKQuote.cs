@@ -688,7 +688,7 @@ namespace SKCOMTester
             string KLineTpye, targettable;
             KLineTpye = boxKLine.SelectedIndex.ToString();
             //1 AM 盤, 0 全盤
-            targettable = boxTradeSession.SelectedIndex == 1 ? "StockHistoryDaily_KLine" : "StockHistoryDaily_ALL_KLine"  ;
+            targettable = boxTradeSession.SelectedIndex == 1 ? "StockHistoryDaily_KLine" : "StockHistoryDaily_KLine";
 
             try
             {
@@ -766,7 +766,7 @@ namespace SKCOMTester
             }
             catch(Exception ex)
             {
-                util.RecordLog(connectionstr,ex.Message);
+                util.RecordLog(connectionstr,ex.Message, util.ALARM);
             }
         }
 
