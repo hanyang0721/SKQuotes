@@ -122,6 +122,12 @@
     <Compile Include="SKQuote.Designer.cs">
       <DependentUpon>SKQuote.cs</DependentUpon>
     </Compile>
+    <Compile Include="SKReply.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SKReply.designer.cs">
+      <DependentUpon>SKReply.cs</DependentUpon>
+    </Compile>
     <Compile Include="Utilties.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
@@ -143,6 +149,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </Content>
+    <EmbeddedResource Include="SKReply.resx">
+      <DependentUpon>SKReply.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

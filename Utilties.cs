@@ -9,6 +9,7 @@ namespace SKQuote
         public const int morning_tradesession = 1;
         public const int night_tradesession = 0;
         public string INFO { get; } = "INFO";
+        public string DEBUG { get; } = "DEBUG";
         public string ALARM { get; } = "ALARM";
 
         public void RecordLog(string connectionstr, string message, string msgtype)

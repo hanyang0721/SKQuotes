@@ -134,7 +134,7 @@ namespace SKCOMTester
             SendReturnMessage("Quote", m_nCode, "SKQuoteLib_LeaveMonitor");
         }
 
-        private void deleteTickData()
+        private void DeleteTickData()
         {
             try
             {
@@ -147,15 +147,15 @@ namespace SKCOMTester
                     sqlcmd.ExecuteNonQuery();
                 }
             }
-            catch
+            catch (Exception ex)
             {
-
+                util.RecordLog(connectionstr, ex.Message, util.ALARM);
             }
         }
 
         private void btnTicks_Click(object sender, EventArgs e)
         {
-            deleteTickData();
+            DeleteTickData();
             listTicks.Items.Clear();
             m_dtBest5Ask.Clear();
             m_dtBest5Bid.Clear();
@@ -475,7 +475,6 @@ namespace SKCOMTester
             OnUpDateDataRow(pSKStock);
         }
 
-
         void m_SKQuoteLib_OnNotifyTicks(short sMarketNo, short sStockIdx, int nPtr, int nDate, int lTimehms, int lTimemillismicros, int nBid, int nAsk, int nClose, int nQty, int nSimulate)
         {
             string strData = "";
@@ -504,15 +503,12 @@ namespace SKCOMTester
                         sqlcmd.CommandText = @" INSERT INTO [dbo].[TickData]([stockIdx],[Ptr], [ndate],[lTimehms],[lTimeMS],[nBid],[nAsk],[nClose],[nQty],[Source]) VALUES
                                 (@stockIdx, @nptr, @ndate,@lTimehms, @lTimeMS, @nBid, @nAskpara, @nClosepara, @nQtypara, 'Live') ";
                         sqlcmd.ExecuteNonQuery();
-
                         TickRunning = true;
                     }
                 }
-                catch
-                {}
-                finally
+                catch(Exception ex)
                 {
-                    //listTicks.Items.Add("[OnNotifyTicks]" + strData);
+                    util.RecordLog(connectionstr, ex.Message, util.DEBUG);
                 }
             }
         }
@@ -549,18 +545,14 @@ namespace SKCOMTester
                         sqlcmd.CommandText = @" INSERT INTO [dbo].[TickData]([stockIdx],[Ptr], [ndate],[lTimehms],[lTimeMS],[nBid],[nAsk],[nClose],[nQty],[Source]) VALUES
                                 (@stockIdx, @nptr, @ndate,@lTimehms, @lTimeMS, @nBid, @nAskpara, @nClosepara, @nQtypara, 'History') ";
                         sqlcmd.ExecuteNonQuery();
+                        TickRunning = true;
                     }
                 }
-                catch 
+                catch (Exception ex)
                 {
-
+                    util.RecordLog(connectionstr, ex.Message, util.DEBUG);
                 }
             }
-
-            //if (listTicks.Items.Count < 200)
-            //    listTicks.SelectedIndex = listTicks.Items.Count - 1;
-            //else
-            //    listTicks.Items.Clear();
         }
 
         void m_SKQuoteLib_OnNotifyBest5(short sMarketNo, short sStockIdx, int nBestBid1, int nBestBidQty1, int nBestBid2, int nBestBidQty2, int nBestBid3, int nBestBidQty3, int nBestBid4, int nBestBidQty4, int nBestBid5, int nBestBidQty5, int nExtendBid, int nExtendBidQty, int nBestAsk1, int nBestAskQty1, int nBestAsk2, int nBestAskQty2, int nBestAsk3, int nBestAskQty3, int nBestAsk4, int nBestAskQty4, int nBestAsk5, int nBestAskQty5, int nExtendAsk, int nExtendAskQty, int nSimulate)
@@ -688,7 +680,7 @@ namespace SKCOMTester
             string KLineTpye, targettable;
             KLineTpye = boxKLine.SelectedIndex.ToString();
             //1 AM 盤, 0 全盤
-            targettable = boxTradeSession.SelectedIndex == 1 ? "StockHistoryDaily_KLine" : "StockHistoryDaily_KLine";
+            targettable = boxTradeSession.SelectedIndex == 1 ? "StockHistoryDaily_KLine" : "StockHistoryDaily_Night_KLine";
 
             try
             {
@@ -1018,21 +1010,21 @@ namespace SKCOMTester
             SendReturnMessage("Quote", m_nCode, "SKQuoteLib_MarketTrading");
         }
 
-        private void button4_Click(object sender, EventArgs e)
+        private void Button4_Click(object sender, EventArgs e)
         {
 
             m_nCode = SKQuoteLib.SKQuoteLib_GetMarketBuySellUpDown();
             SendReturnMessage("Quote", m_nCode, "SKQuoteLib_RequestMarketBuySellUpDown");
         }
 
-        private void lblSignal_Paint(object sender, PaintEventArgs e)
+        private void LblSignal_Paint(object sender, PaintEventArgs e)
         {
             if (lblSignal.ForeColor == Color.DarkRed)
                 btnDisconnect_Click(this, null);     //Nework is broken收到網路已斷線
         }
 
     
-        private void btnKLineAM_Click(object sender, EventArgs e)
+        private void BtnKLineAM_Click(object sender, EventArgs e)
         {
             listKLine.Items.Clear();
 
@@ -1062,7 +1054,7 @@ namespace SKCOMTester
             //boxTradeSession
         }
 
-        private void btnLiveTick_Click(object sender, EventArgs e)
+        private void BtnLiveTick_Click(object sender, EventArgs e)
         {
             listTicks.Items.Clear();
             
@@ -1116,12 +1108,5 @@ namespace SKCOMTester
                 ConnectedLabel.BackColor = Color.DarkRed;
             }
         }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-
-        }
-
- 
     }   
 }

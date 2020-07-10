@@ -37,10 +37,12 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.listInformation = new System.Windows.Forms.ListBox();
             this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.StatusListBox = new System.Windows.Forms.ListBox();
             this.skQuote1 = new SKCOMTester.SKQuote();
+            this.skReply1 = new SKCOMTester.SKReply();
             this.timer2 = new System.Windows.Forms.Timer(this.components);
             this.groupBox1.SuspendLayout();
             this.tabPage3.SuspendLayout();
@@ -138,10 +140,24 @@
             this.tabPage3.Text = "報價";
             this.tabPage3.UseVisualStyleBackColor = true;
             // 
+            // tabPage1
+            // 
+            this.tabPage1.AutoScroll = true;
+            this.tabPage1.Controls.Add(this.skReply1);
+            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(1098, 793);
+            this.tabPage1.TabIndex = 2;
+            this.tabPage1.Text = "回報";
+            this.tabPage1.UseVisualStyleBackColor = true;
+
+            // 
             // tabControl1
             // 
             this.tabControl1.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.tabControl1.Controls.Add(this.tabPage3);
+            this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Location = new System.Drawing.Point(12, 127);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
@@ -177,10 +193,26 @@
             this.skQuote1.TickRunning = false;
             this.skQuote1.GetMessage += new SKCOMTester.SKQuote.MyMessageHandler(this.GetMessage);
             // 
+            // skReply1
+            // 
+            this.skReply1.AutoScroll = true;
+            this.skReply1.AutoSize = true;
+            this.skReply1.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.skReply1.Location = new System.Drawing.Point(3, 6);
+            this.skReply1.LoginID = "";
+            this.skReply1.LoginID2 = "";
+            this.skReply1.Name = "skReply1";
+            this.skReply1.OrderM = false;
+            this.skReply1.Size = new System.Drawing.Size(1000, 866);
+            this.skReply1.SKReplyLib = null;
+            this.skReply1.SKReplyLib2 = null;
+            this.skReply1.TabIndex = 0;
+            this.skReply1.GetMessage += new SKCOMTester.SKReply.MyMessageHandler(this.GetMessage);
+            // 
             // timer2
             // 
             this.timer2.Interval = 10000;
-            this.timer2.Tick += new System.EventHandler(this.timer2_Tick);
+            this.timer2.Tick += new System.EventHandler(this.Timer2_Tick);
             // 
             // Form1
             // 
@@ -198,6 +230,8 @@
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.tabPage3.ResumeLayout(false);
+            this.tabPage1.ResumeLayout(false);
+            this.tabPage1.PerformLayout();
             this.tabControl1.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -217,6 +251,8 @@
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.ListBox StatusListBox;
         private System.Windows.Forms.Timer timer2;
+        private SKReply skReply1;
+        private System.Windows.Forms.TabPage tabPage1;
     }
 }
 

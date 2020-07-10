@@ -140,7 +140,7 @@
             this.lblSignal.Size = new System.Drawing.Size(32, 22);
             this.lblSignal.TabIndex = 0;
             this.lblSignal.Text = "●";
-            this.lblSignal.Paint += new System.Windows.Forms.PaintEventHandler(this.lblSignal_Paint);
+            this.lblSignal.Paint += new System.Windows.Forms.PaintEventHandler(this.LblSignal_Paint);
             // 
             // button1
             // 
@@ -303,7 +303,7 @@
             this.btnLiveTick.TabIndex = 18;
             this.btnLiveTick.Text = "RequestLiveTick";
             this.btnLiveTick.UseVisualStyleBackColor = true;
-            this.btnLiveTick.Click += new System.EventHandler(this.btnLiveTick_Click);
+            this.btnLiveTick.Click += new System.EventHandler(this.BtnLiveTick_Click);
             // 
             // GridBest5Bid
             // 

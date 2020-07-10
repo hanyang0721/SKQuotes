@@ -19,10 +19,11 @@ namespace SKCOMTester
         // Environment Variable
         //----------------------------------------------------------------------
         int m_nCode;
+        int retrytimes = 0;
 
         SKCenterLib m_pSKCenter;
         SKCenterLib m_pSKCenter2;
-
+        SKReplyLib m_pSKReply;
         SKQuoteLib m_pSKQuote;
         SKOSQuoteLib m_pSKOSQuote;
 
@@ -54,6 +55,12 @@ namespace SKCOMTester
             m_pSKOSQuote = new SKOSQuoteLib();
        
             m_pSKCenter2.OnShowAgreement += new _ISKCenterLibEvents_OnShowAgreementEventHandler(this.OnShowAgreement);
+
+            m_pSKReply = new SKReplyLib();
+            skReply1.SKReplyLib = m_pSKReply;
+
+            m_pSKReply.OnReplyMessage += new _ISKReplyLibEvents_OnReplyMessageEventHandler(this.OnAnnouncement);
+
 
             txtAccount.Text = System.Configuration.ConfigurationManager.AppSettings.Get("Username");
             txtPassWord.Text = System.Configuration.ConfigurationManager.AppSettings.Get("Password");
@@ -113,6 +120,13 @@ namespace SKCOMTester
             }
             else
                 WriteMessage(m_nCode);
+        }
+
+        //Mandatory to Add this after API version 2.13.17
+        void OnAnnouncement(string strUserID, string bstrMessage, out short nConfirmCode)
+        {
+            WriteMessage(strUserID + "_" + bstrMessage);
+            nConfirmCode = -1;
         }
 
         public void WriteMessage(string strMsg)
@@ -175,22 +189,32 @@ namespace SKCOMTester
                 Button getbtnTick = skQuote1.Controls.Find("btnTicks", true).FirstOrDefault() as Button;
                 getbtnTick.PerformClick();
                 util.RecordLog(connectionstr, "Downloading Ticks", util.INFO);
+                retrytimes = retrytimes + 1;
+                if(retrytimes==5)
+                {
+                    timer1.Enabled = false;
+                }
             }
         }
 
-        private void timer2_Tick(object sender, EventArgs e)
+        /*
+         * KLineProcessCount 0: Minutes KLine, 全盤
+         * KLineProcessCount 1: Daily, 全盤
+         * KLineProcessCount 2: Daily, 早盤
+         * */
+        private void Timer2_Tick(object sender, EventArgs e)
         {
             DownloadKLine(KLineProcessCount);
             KLineProcessCount++;
 
-            if(KLineProcessCount==2)
+            if(KLineProcessCount==3)
             {
                 timer2.Enabled = false;
                 util.RecordLog(connectionstr, "KLine Minute and Daily table import complete", util.INFO);
             }
         }
 
-        private void DownloadKLine(int KLineType)
+        private void DownloadKLine(int KLineProcessCount)
         {
             TabControl gettabcontrol = skQuote1.Controls.Find("tabControl1", true).FirstOrDefault() as TabControl;
             gettabcontrol.SelectedIndex = 2; //Switch to KLine download panel
@@ -200,13 +224,14 @@ namespace SKCOMTester
             ComboBox getCombo3 = skQuote1.Controls.Find("boxOutType", true).FirstOrDefault() as ComboBox;
             ComboBox getCombo4 = skQuote1.Controls.Find("boxTradeSession", true).FirstOrDefault() as ComboBox;
             getCombo1.SelectedIndex = 0;//Query by stockNo
-            getCombo2.SelectedIndex = KLineType == 0 ? 0 : 4 ;//0 minutes, 4 daily
+            getCombo2.SelectedIndex = KLineProcessCount == 0 ? 0 : 4 ;//0 minutes, 4 daily
             getCombo3.SelectedIndex = 0;//舊版格式
-            getCombo4.SelectedIndex = util.GetTradeSession();//0: 全盤 1:AM盤
+            //getCombo4.SelectedIndex = util.GetTradeSession();//0: 全盤 1:AM盤
+            getCombo4.SelectedIndex = KLineProcessCount <= 1 ? 0 : 1; //KLineProcessCount=2 then 全盤 daily,  0: 全盤 1:AM盤
             Button getbtnTick = skQuote1.Controls.Find("btnKLine", true).FirstOrDefault() as Button;
             getbtnTick.PerformClick();
-            WriteMessage("【KLine】 Downaloaded " + (KLineType == 0 ? "Minute" : "Daily") + " Complete");
-            util.RecordLog(connectionstr, "KLine Downaloaded " + (KLineType == 0 ? "Minute" : "Daily") + " Complete", util.INFO);
+            WriteMessage("【KLine】 Downaloaded " + (KLineProcessCount == 0 ? "Minute" : "Daily") + " Complete");
+            util.RecordLog(connectionstr, "KLine Downaloaded " + (KLineProcessCount == 0 ? "Minute" : "Daily") + " Complete", util.INFO);
 
             gettabcontrol.SelectedIndex = 1;
         }
